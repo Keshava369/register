@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/js/bootstrap.min.js" integrity="sha512-5BqtYqlWfJemW5+v+TZUs22uigI8tXeVah5S/1Z6qBLVO7gakAOtkOzUtgq6dsIo5c0NJdmGPs0H9I+2OHUHVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <style>
+            * {box-sizing: border-box;}
+
+   /* Style the input container */
+ .input-container {
+  display: flex;
+  width: 100%;
+  margin-bottom: 15px;
+ }
+
+ /* Style the form icons */
+ .icon {
+  padding: 10px;
+  background: dodgerblue;
+  color: white;
+  min-width: 50px;
+  text-align: center;
+ }
+
+ /* Style the input fields */
+ .input-field {
+  width: 100%;
+  padding: 10px;
+  outline: none;
+ }
+
+ .input-field:focus {
+  border: 2px solid dodgerblue;
+ }
+
+ /* Set a style for the submit button */
+ .btn {
+  background-color: dodgerblue;
+  color: white;
+  padding: 15px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  opacity: 0.9;
+ }
+
+ .btn:hover {
+  opacity: 1;
+ }
+        </style>
+    </head>
+ <body>
+    <form method="post">
+        <h2>Register Form</h2>
+        <div class="input-container">
+          <i class="fa fa-user icon"></i>
+          <input class="input-field" type="text" placeholder="ID" id="empId">
+        </div>
+      
+        <div class="input-container">
+          <i class="fa fa-envelope icon"></i>
+          <input class="input-field" type="text" placeholder="NAME" id="empName">
+        </div>
+      
+        <div class="input-container">
+          <i class="fa fa-key icon"></i>
+          <input class="input-field" type="email"  placeholder="Email" id="empEmail">
+        </div>
+      
+        <button type="button" class="btn" id="empSave" value="Save" onclick="saveEmployee()">Register</button>
+
+        
+      </form>
+ </body>
+
+  <script>
+ 
+    function createPUTRequest(connToken, jsonObj, dbName, relName) {
+
+        var putRequest = "{\n"
+        
+        + "\"token\": \""
+        
+        + connToken
+
+        +"\","
+        +"\"dbName\": \""
+        
+        + dbName
+        
+        + "\",\n" + "\"cmd\" : \"PUT\",\n"
+
+        +"\"rel\" : \""
+        
+        + relName + "\","
+        
+        + "\"jsonStr\":\n"
+        
+        +jsonObj
+
+        +"\n"
+        
+        + "}";
+        
+        return putRequest;
+        
+        }
+
+        function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+
+          var url = dbBaseUrl + apiEndPointUrl;
+          
+          var jsonObj;
+          
+          $.post(url, reqString, function (result) { jsonObj = JSON.parse(result); }).fail(function (result) {
+          
+          var dataJsonObj = result.responseText; jsonObj = JSON.parse(dataJsonObj);
+          
+          }); return jsonObj;
+          
+          }
+          
+          function resetForm() {
+          
+          $( "#empId").val("")
+          
+          $( "#empName").val("");
+          
+          $( "#empEmail").val("");
+          
+          $("#empId").focus();
+
+          }
+      
+        
+          
+          function saveEmployee() {
+          
+          var jsonStr = validateAndGetFormData();
+          
+          if (jsonStr === "") {
+          
+          return;
+          
+          }
+        }
+
+    function validateAndGetFormData() {
+        var empIdVar = $("#empId").val();
+        if (empIdVar === "") {
+        
+         alert("Employee ID Required Value"); 
+         $("#empId").focus(); 
+        
+        return "";
+        
+        }
+        
+        var empNameVar = $("#empName").val();
+        
+        if (empNameVar === "") {
+        
+        alert("Employee Name is Required Value"); $( "empName").focus();
+        
+        return "";
+        
+        }
+        
+        var empEmailVar = $("#empEmail").val();
+        
+        if (empEmailVar === "") {
+        
+        alert("Employee Email is Required Value"); $("#empEmail").focus(); 
+        return "";
+        
+        } 
+        var jsonStrObj = {
+        
+        empId: empIdVar, 
+        enpName: empNameVar, 
+        empEmail: empEmailVar,
+        };
+        
+        return JSON.stringify(jsonStrObj);
+        }
+
+    function saveEmployee(){
+        var jsonStr = validateAndGetFormData();
+        if (jsonStr === "") {
+
+            return;
+            
+            }
+            
+            var putReqStr = createPUTRequest("90937620|-31949269259541459|90952719", jsonStr, "SAMPLE", "EMP-REL");
+            
+            //alert(putReqStr);
+            
+            jQuery.ajaxSetup({async: false});
+            
+            var resultObj = executeCommand(putReqStr, "http://api.login2explore.com:5577", "/api/iml");
+
+            jQuery.ajaxSetup({async: true});
+            
+            //alert(JSON.stringify(resultObj)); 
+
+            alert("Successfully Registered");
+            
+            resetForm();
+    }
+   </script>
+
+</html>
